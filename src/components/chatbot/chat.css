@@ -13,6 +13,7 @@
 
 body {
   margin: 0;
+  overflow: hidden;
   background: radial-gradient(circle at top, #111827, #000);
   font-family: system-ui, -apple-system, sans-serif;
   color: var(--text-main);
@@ -20,7 +21,7 @@ body {
 
 .app {
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   backdrop-filter: blur(10px);
 }
 
@@ -87,6 +88,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%;
   background: transparent;
 }
 
@@ -133,6 +135,7 @@ body {
 
 /* ===== Input Bar ===== */
 .chat-input {
+  flex-shrink: 0;
   padding: 16px;
   border-top: 1px solid var(--border);
   display: flex;
