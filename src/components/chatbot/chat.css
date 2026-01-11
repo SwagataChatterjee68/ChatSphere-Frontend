@@ -13,16 +13,24 @@
 
 body {
   margin: 0;
-  overflow: hidden;
   background: radial-gradient(circle at top, #111827, #000);
   font-family: system-ui, -apple-system, sans-serif;
   color: var(--text-main);
 }
 
+/* ===== App Layout ===== */
 .app {
   display: flex;
-  height: 100dvh;
+  min-height: 100svh; /* keyboard-safe */
+  height: 100dvh;     /* dynamic viewport */
   backdrop-filter: blur(10px);
+}
+
+/* Disable page scrolling on mobile */
+@media (max-width: 768px) {
+  body {
+    overflow: hidden;
+  }
 }
 
 /* ===== Sidebar ===== */
@@ -89,7 +97,6 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: transparent;
 }
 
 .chat-header {
@@ -100,6 +107,7 @@ body {
   backdrop-filter: blur(6px);
 }
 
+/* ===== Messages ===== */
 .chat-messages {
   flex: 1;
   padding: 24px;
@@ -137,6 +145,7 @@ body {
 .chat-input {
   flex-shrink: 0;
   padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
   display: flex;
   gap: 10px;
@@ -172,17 +181,20 @@ body {
   cursor: pointer;
 }
 
-/* ===== Mobile ===== */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 220px;
-  }
-
-  .message {
-    max-width: 85%;
-  }
+/* ===== Empty State ===== */
+.empty-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 16px;
+  font-weight: 500;
+  opacity: 0.8;
+  user-select: none;
 }
-/* Toggle button */
+
+/* ===== Menu Button ===== */
 .menu-btn {
   display: none;
   position: absolute;
@@ -194,17 +206,21 @@ body {
   cursor: pointer;
 }
 
-/* Mobile sidebar */
+/* ===== Mobile ===== */
 @media (max-width: 768px) {
   .menu-btn {
     display: block;
+  }
+
+  .message {
+    max-width: 85%;
   }
 
   .sidebar {
     position: fixed;
     left: -100%;
     top: 0;
-    height: 100vh;
+    height: 100svh;
     width: 50%;
     max-width: 300px;
     z-index: 20;
@@ -218,15 +234,16 @@ body {
   .chat-container {
     width: 100%;
   }
-}
-.empty-state {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-  font-size: 16px;
-  font-weight: 500;
-  opacity: 0.8;
-  user-select: none;
+
+  /* Hide scrollbars on mobile */
+  .chat-messages,
+  .conversation-list {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .chat-messages::-webkit-scrollbar,
+  .conversation-list::-webkit-scrollbar {
+    display: none;
+  }
 }
