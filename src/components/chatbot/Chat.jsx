@@ -13,11 +13,24 @@ export default function Chat() {
   const activeConversation = conversations.find((c) => c.id === activeId);
   const activeIdRef = useRef(activeId);
 
+  /* ✅ MOBILE KEYBOARD FIX (DO NOT REMOVE) */
+  useEffect(() => {
+    const updateVh = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    };
+
+    updateVh();
+    window.addEventListener("resize", updateVh);
+
+    return () => window.removeEventListener("resize", updateVh);
+  }, []);
+
   useEffect(() => {
     activeIdRef.current = activeId;
   }, [activeId]);
 
-  // Listen for AI response
+  /* Listen for AI response */
   useEffect(() => {
     socket.on("ai-message-response", (response) => {
       setConversations((prev) =>
@@ -41,7 +54,6 @@ export default function Chat() {
   const sendMessage = () => {
     if (!input.trim()) return;
 
-    // If no chat exists, create one
     if (!activeConversation) {
       const id = Date.now();
       const newChat = {
@@ -58,7 +70,6 @@ export default function Chat() {
       return;
     }
 
-    // Existing chat
     setConversations((prev) =>
       prev.map((c) =>
         c.id === activeId
