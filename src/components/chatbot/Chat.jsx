@@ -9,11 +9,12 @@ export default function Chat() {
   const [activeId, setActiveId] = useState(null);
   const [input, setInput] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [aiTyping, setAiTyping] = useState(false);
 
   const activeConversation = conversations.find((c) => c.id === activeId);
   const activeIdRef = useRef(activeId);
 
-  /* ✅ MOBILE KEYBOARD FIX (DO NOT REMOVE) */
+  /* Mobile keyboard fix */
   useEffect(() => {
     const updateVh = () => {
       const vh = window.innerHeight * 0.01;
@@ -22,7 +23,6 @@ export default function Chat() {
 
     updateVh();
     window.addEventListener("resize", updateVh);
-
     return () => window.removeEventListener("resize", updateVh);
   }, []);
 
@@ -30,9 +30,10 @@ export default function Chat() {
     activeIdRef.current = activeId;
   }, [activeId]);
 
-  /* Listen for AI response */
+  /* AI response */
   useEffect(() => {
     socket.on("ai-message-response", (response) => {
+      setAiTyping(false);
       setConversations((prev) =>
         prev.map((c) =>
           c.id === activeIdRef.current
@@ -51,6 +52,15 @@ export default function Chat() {
     return () => socket.off("ai-message-response");
   }, []);
 
+  /* Typing indicator */
+  useEffect(() => {
+    socket.on("ai-typing", (status) => {
+      setAiTyping(status);
+    });
+
+    return () => socket.off("ai-typing");
+  }, []);
+
   const sendMessage = () => {
     if (!input.trim()) return;
 
@@ -64,7 +74,6 @@ export default function Chat() {
 
       setConversations([newChat]);
       setActiveId(id);
-
       socket.emit("ai-message", { prompt: input });
       setInput("");
       return;
@@ -97,7 +106,6 @@ export default function Chat() {
 
   return (
     <div className="app">
-      {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-header">
           <span>Chats</span>
@@ -120,7 +128,6 @@ export default function Chat() {
         </div>
       </aside>
 
-      {/* Chat */}
       <main className="chat-container">
         <div className="chat-header">
           <button
@@ -136,11 +143,21 @@ export default function Chat() {
           {!activeConversation || activeConversation.messages.length === 0 ? (
             <div className="empty-state">Start chatting</div>
           ) : (
-            activeConversation.messages.map((m, i) => (
-              <div key={i} className={`message ${m.role}`}>
-                {m.text}
-              </div>
-            ))
+            <>
+              {activeConversation.messages.map((m, i) => (
+                <div key={i} className={`message ${m.role}`}>
+                  {m.text}
+                </div>
+              ))}
+
+              {aiTyping && (
+                <div className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              )}
+            </>
           )}
         </div>
 
